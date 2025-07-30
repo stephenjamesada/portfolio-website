@@ -10,6 +10,32 @@ html, body {
     font-family: 'Fira Code', 'Courier New', monospace;
 }
 
+p {
+    line-height: 2;
+}
+
+.about-container {
+    max-width: 60ch;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.about-container ul {
+    list-style: none;
+    padding-left: 1rem;
+    line-height: 2;
+    color: #ddd;
+}
+
+li:before {
+    color: #8ba4f8;
+    margin-right: 0.5rem;
+}
+
+li {
+    margin-bottom: 0.3rem;
+}
+
 html {
     scroll-behavior: smooth;
 }
@@ -41,6 +67,13 @@ a:hover i {
     align-items: center;
     height: 25vh;
     margin-top: 40px;
+}
+
+.link-container-horizontal {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
 }
 
 a:hover {
