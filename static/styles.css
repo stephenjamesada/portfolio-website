@@ -69,13 +69,6 @@ a:hover i {
     margin-top: 70px;
 }
 
-.link-container-horizontal {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-}
-
 a:hover {
     color: #f5f5f5;
     transform: scale(1.05);
