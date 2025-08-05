@@ -9,24 +9,33 @@
     <meta property="og:title" content="Stephen Ada | Developer Portfolio">
     <meta property="og:description" content="Showcasing my coding and programming projects.">
     <meta property="og:type" content="website">
-    <title>Stephen Ada | Portfolio</title>
+    <title>Stephen Ada | Portfolio | Subscribe</title>
     <link rel="stylesheet" href="static/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <header>
-        <h1>Hardware</h1>
+    <h1>Subscription Form</h1>
     </header>
     <main>
-        <p>This page is dedicated to all the computers that I use and own. Pictures will be provided.</p>
-    <nav class="link-container">
-    <a href="/">Home</a>
-    <a href="about.html">About</a>
-    </nav>
-    </main>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flash-messages">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+    <form action="/subscribe" method="POST" class="subscribe-form">
+        <label for="email">Subscribe to get updates:</label>
+        <input type="email" id="email" name="email" placeholder="you@example.com" required>
+        <button type="submit" id="subscribe-button">Subscribe</button>
+    </form>
     <footer>
-        <p>&copy; Stephen Ada All Rights Reserved</p>
+        <p>&copy; {{ current_year }} Stephen Ada All Rights Reserved</p>
     </footer>
+    </main>
     <script src="static/script.js" defer></script>
 </body>
 </html>
