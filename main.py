@@ -4,6 +4,8 @@ from config import SECRET_KEY
 from flask_mail import Mail, Message
 import json
 import os
+import hmac
+import hashlib
 
 app = Flask(__name__)
 
@@ -14,6 +16,7 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.getenv("MAIL_USERNAME")
 app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASSWORD")
 
+GITHUB_SECRET = os.environ.get("GITHUB_WEBHOOK_SECRET").encode()
 mail = Mail(app)
 
 @app.route('/')
@@ -44,6 +47,10 @@ def bad_request(e):
 def forbidden(e):
     return render_template('403.html'), 403
 
+@app.errorhandler(503)
+def service_unavailable(e):
+    return render_template('503.html'), 503
+
 @app.route('/subscribe', methods=['GET'])
 def subscribe():
     return render_template('subscribe.html')
@@ -55,7 +62,7 @@ def subscribe_form():
     try:
         valid = validate_email(raw_email)
         email = valid.email.lower()
-        filepath = 'subscribers.json'
+        filepath = 'data/subscribers.json'
     
     except EmailNotValidError:
         flash("Invalid email address.", "error")
@@ -87,5 +94,50 @@ def subscribe_form():
     flash("Thank you for subscribing!", "success")
     return redirect(url_for('subscribe_form'))
     
+@app.route('/webhook/github', methods=['POST'])
+def github_webhook():
+    signature = request.headers.get('X-Hub-Signature-256')
+    if signature is None:
+        abort(403)
+    
+    sha_name, signature = signature.split('=')
+    if sha_name != 'sha256':
+        abort(403)
+    
+    mac = hmac.new(GITHUB_SECRET, msg=request.data, digestmod=hashlib.sha256)
+    if not hmac.compare_digest(mac.hexdigest(), signature):
+        abort(403)
+    
+    payload = request.json
+
+    event = request.headers.get('X-GitHub-Event')
+    if event == 'push':
+        repo = payload["repository"]["full_name"]
+        commits = payload["commits"]
+        latest_commit = commits[-1]["message"]
+        link = payload["compare"]
+
+        message = f"New push to **{repo}**:\n\n{latest_commit}\n\nView it: {link}"
+
+        filepath = subscribers.json
+        try:
+            with open(filepath, 'r') as f:
+                subscribers = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            subscribers = []
+        
+        for email in subscribers:
+            msg = Message(
+                subject=f"GitHub Update: {repo}",
+                sender=app.config['MAIL_USERNAME'],
+                recipients=[email]
+            )
+            msg.body = message
+            mail.send(msg)
+        
+        return "Webhook received", 200
+    
+    return "Ignored event", 200
+
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=False)

@@ -8,16 +8,38 @@ html, body {
     text-align: center;
     min-height: 100vh;
     font-family: 'Fira Code', 'Courier New', monospace;
+    opacity: 0;
+    animation: fadeIn 0.4s ease-in forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
 }
 
 p {
     line-height: 2;
 }
 
+hr {
+    border: none;
+    border-top: 1px solid #666;
+    width: 60%;
+    height: 3px;
+    border-radius: 2px;
+    margin: 2rem auto;
+
+}
+
 .about-container {
     max-width: 60ch;
     margin: 0 auto;
     padding: 1rem;
+}
+
+#proj-page-links {
+    margin-top: 20px;
 }
 
 .flash-messages {
