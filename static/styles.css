@@ -20,6 +20,12 @@ p {
     padding: 1rem;
 }
 
+.flash-messages {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
 .subscribe-form {
     background-color: #121212;
     padding: 1.5rem;

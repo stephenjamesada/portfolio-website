@@ -1,11 +1,20 @@
 from flask import Flask, render_template, request, abort, url_for, redirect, flash
 from email_validator import validate_email, EmailNotValidError
 from config import SECRET_KEY
+from flask_mail import Mail, Message
 import json
 import os
 
 app = Flask(__name__)
+
 app.config['SECRET_KEY'] = SECRET_KEY
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.getenv("MAIL_USERNAME")
+app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASSWORD")
+
+mail = Mail(app)
 
 @app.route('/')
 def index():
@@ -14,10 +23,6 @@ def index():
 @app.route('/about')
 def about():
     return render_template('about.html')
-
-@app.route('/hardware')
-def hardware():
-    return render_template('hardware.html')
 
 @app.route('/projects')
 def projects():
@@ -67,6 +72,14 @@ def subscribe_form():
         return redirect(url_for('subscribe_form'))
     
     subscribers.append(email)
+    
+    msg = Message(
+        subject="Thanks for subscribing!",
+        sender=app.config['MAIL_USERNAME'],
+        recipients=[email]
+    )
+    msg.body = "Thanks for subscribing to updates from Stephen Ada's portfolio!"
+    mail.send(msg)
 
     with open(filepath, 'w') as f:
         json.dump(subscribers, f, indent=2)

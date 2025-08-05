@@ -7,4 +7,9 @@
 <div class="project-container">
     <a href="https://github.com/stephenjamesada/portfolio-website" rel="noopener noreferrer">This Site's Repository</a>
 </div>
+<nav class="link-container">
+        <a href="{{ url_for('about') }}">About</a>
+        <a href="{{ url_for('projects') }}">Projects</a>
+        <a href="{{ url_for('/') }}">Home</a>
+    </nav>
 {% endblock %}
