@@ -108,7 +108,7 @@ a:hover i {
     justify-content: center;
     align-items: center;
     height: 25vh;
-    margin-top: 100px;
+    margin-top: 130px;
 }
 
 a:hover {
@@ -134,7 +134,7 @@ a:hover::after {
 }
 
 footer {
-    margin-top: 100px;
+    margin-top: 130px;
     font-size: 0.85rem;
     color: #666;
     text-align: center;
