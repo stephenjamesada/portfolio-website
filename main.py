@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, abort, url_for, redirect, fla
 from email_validator import validate_email, EmailNotValidError
 from config import SECRET_KEY
 from flask_mail import Mail, Message
+from flask_talisman import Talisman
 import json
 import os
 import hmac
@@ -18,6 +19,38 @@ app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASSWORD")
 
 GITHUB_SECRET = os.environ.get("GITHUB_WEBHOOK_SECRET").encode()
 mail = Mail(app)
+
+csp = {
+    'default-src': ["'self'"],
+    'script-src': ["'self'"],
+    'style-src': ["'self'", "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"],
+    'font-src': ["'self'", "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"],
+    'img-src': ["'self'", "data:"],
+    'object-src': ["'none'"],
+    'base-uri': ["'none'"],
+    'form-action': ["'self'"],
+    'frame-ancestors': ["'none'"]
+}
+
+Talisman(
+    app,
+    content_security_policy=csp,
+    frame_options='DENY',
+    content_type_options='nosniff',
+    strict_transport_security=True,
+    strict_transport_security_max_age=31536000,
+    strict_transport_security_include_subdomains=True,
+    referrer_policy='no-referrer',
+    permissions_policy={
+        "geolocation": "()",
+        "camera": "()",
+        "microphone": "()",
+        "fullscreen": "()",
+        "payment": "()"
+    },
+    cross_origin_embedder_policy='require-corp',
+    cross_origin_opener_policy='same-origin'
+)
 
 @app.route('/')
 def index():
