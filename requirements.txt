@@ -19,8 +19,11 @@ docx2txt==0.8
 email_validator==2.2.0
 ExifRead==2.3.2
 Flask==3.1.1
+Flask-Mail==0.10.0
 flask-ngrok==0.0.25
+flask-talisman==1.1.0
 frozenlist==1.6.0
+gunicorn==23.0.0
 idna==3.10
 itsdangerous==2.2.0
 Jinja2==3.1.6
