@@ -36,7 +36,7 @@ Talisman(
     app,
     content_security_policy=csp,
     frame_options='DENY',
-    content_type_options='nosniff',
+    x_content_type_options='nosniff',
     strict_transport_security=True,
     strict_transport_security_max_age=31536000,
     strict_transport_security_include_subdomains=True,
