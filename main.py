@@ -47,9 +47,7 @@ Talisman(
         "microphone": "()",
         "fullscreen": "()",
         "payment": "()"
-    },
-    cross_origin_embedder_policy='require-corp',
-    cross_origin_opener_policy='same-origin'
+    }
 )
 
 @app.route('/')
