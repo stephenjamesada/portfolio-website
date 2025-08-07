@@ -17,14 +17,15 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.getenv("MAIL_USERNAME")
 app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASSWORD")
 
-GITHUB_SECRET = os.environ.get("GITHUB_WEBHOOK_SECRET").encode()
+GITHUB_SECRET = os.environ.get("GITHUB_WEBHOOK_SECRET", "").encode()
+
 mail = Mail(app)
 
 csp = {
     'default-src': ["'self'"],
     'script-src': ["'self'"],
-    'style-src': ["'self'", "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"],
-    'font-src': ["'self'", "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"],
+    'style-src': ["'self'"],
+    'font-src': ["'self'"],
     'img-src': ["'self'", "data:"],
     'object-src': ["'none'"],
     'base-uri': ["'none'"],
@@ -129,46 +130,67 @@ def subscribe_form():
 def github_webhook():
     signature = request.headers.get('X-Hub-Signature-256')
     if signature is None:
+        print("Missing signature header.")
         abort(403)
     
-    sha_name, signature = signature.split('=')
+    try:
+        sha_name, signature = signature.split('=')
+    except ValueError:
+        print("Malformed signature header.")
+        abort(403)
+    
     if sha_name != 'sha256':
+        print("Unsupported hash method: {sha_name}")
         abort(403)
-    
+
     mac = hmac.new(GITHUB_SECRET, msg=request.data, digestmod=hashlib.sha256)
     if not hmac.compare_digest(mac.hexdigest(), signature):
+        print("Invalid signature. Webhook rejected.")
         abort(403)
     
     payload = request.json
-
     event = request.headers.get('X-GitHub-Event')
-    if event == 'push':
-        repo = payload["repository"]["full_name"]
-        commits = payload["commits"]
-        latest_commit = commits[-1]["message"]
-        link = payload["compare"]
 
-        message = f"New push to **{repo}**:\n\n{latest_commit}\n\nView it: {link}"
+    if event != "push":
+        return "Ignored event", 200
+
+    if event == 'push':
+        try:
+            repo = payload["repository"]["full_name"]
+            commits = payload["commits"]
+            latest_commit = commits[-1]["message"]
+            link = payload["compare"]
+        except (KeyError, IndexError) as e:
+            print(f"Payload missing data: {e}")
+            return "Malformed payload", 400
+
+        message = f"""New push to **{repo}**!
+        
+        Commit: {latest_commit}
+
+        View it: {link}
+        """
 
         filepath = subscribers.json
         try:
             with open(filepath, 'r') as f:
                 subscribers = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            print(f"Subscriber file error: {e}")
             subscribers = []
         
         for email in subscribers:
             msg = Message(
-                subject=f"GitHub Update: {repo}",
+                subject=f"[GitHub] New Push to {repo}",
                 sender=app.config['MAIL_USERNAME'],
                 recipients=[email]
             )
             msg.body = message
             mail.send(msg)
         
+        print(f"Webhook processed: {repo}, notified {len(subscribers)} subscriber(s).")
+
         return "Webhook received", 200
     
-    return "Ignored event", 200
-
 if __name__ == "__main__":
-    app.run()
+    app.run(host="127.0.0.1", port=5000, debug=False)
