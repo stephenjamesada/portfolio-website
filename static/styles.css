@@ -211,3 +211,35 @@ footer {
     hr { width: 50%; }
     body { font-size: 17px; }
 }
+
+.hero h1 {
+    margin: 0 0 .25rem;
+    font-size: clamp(2rem, 7vw, 3rem);
+    line-height: 1.1;
+}
+.hero p {
+    max-width: 60ch;
+    margin: 0 auto 1.25rem;
+    font-size: clamp(1rem, 2.6vw, 1.125rem);
+    line-height: 1.4;
+}
+
+.link-container {
+    gap: clamp(.6rem, 2.8vw, 1rem);
+    margin-top: clamp(1rem, 6vh, 2.5rem);
+}
+
+.link-container a {
+    display: inline-block;
+    font-size: clamp(1.05rem, 3.2vw, 1.4rem);
+    line-height: 1.2;
+}
+
+@media (min-width: 768px) {
+    .link-container {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: clamp(.5rem, 1.5vw, 1rem);
+    }
+}
