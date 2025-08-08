@@ -101,7 +101,7 @@ def subscribe_form():
     
     except EmailNotValidError:
         flash("Invalid email address.", "error")
-        return redirect(url_for('subscribe_form'))
+        return redirect(url_for('subscribe'))
 
     try:
         with open(filepath, 'r') as f:
@@ -111,7 +111,7 @@ def subscribe_form():
     
     if email in subscribers:
         flash("You're already subscribed!", "info")
-        return redirect(url_for('subscribe_form'))
+        return redirect(url_for('subscribe'))
     
     subscribers.append(email)
     
@@ -126,7 +126,7 @@ def subscribe_form():
         json.dump(subscribers, f, indent=2)
 
     flash("Thank you for subscribing!", "success")
-    return redirect(url_for('subscribe_form'))
+    return redirect(url_for('subscribe'))
     
 @app.route('/webhook/github', methods=['POST'])
 def github_webhook():
