@@ -11,11 +11,14 @@ import hashlib
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = SECRET_KEY
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
+
+app.config['MAIL_SERVER'] = os.getenv("MAIL_SERVER", 'smtp.gmail.com')
+app.config['MAIL_PORT'] = int(os.getenv("MAIL_PORT", 587))
+app.config['MAIL_USE_TLS'] = os.getenv("MAIL_USE_TLS", "true").lower() == "true"
+app.config['MAIL_USE_SSL'] = os.getenv("MAIL_USE_SSL", "false").lower() == "false"
 app.config['MAIL_USERNAME'] = os.getenv("MAIL_USERNAME")
 app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASSWORD")
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv("MAIL_DEFAULT_SENDER", app.config['MAIL_USERNAME'])
 
 GITHUB_SECRET = os.environ.get("GITHUB_WEBHOOK_SECRET", "").encode()
 
@@ -114,10 +117,9 @@ def subscribe_form():
     
     msg = Message(
         subject="Thanks for subscribing!",
-        sender=app.config['MAIL_USERNAME'],
-        recipients=[email]
+        recipients=[email],
+        body="Thanks for subscribing to updates from Stephen Ada's portfolio!"
     )
-    msg.body = "Thanks for subscribing to updates from Stephen Ada's portfolio!"
     mail.send(msg)
 
     with open(filepath, 'w') as f:
