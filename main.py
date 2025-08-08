@@ -23,7 +23,7 @@ mail = Mail(app)
 
 csp = {
     'default-src': ["'self'"],
-    'script-src': ["'self'"],
+    'script-src': ["'self'", "'unsafe-inline'"],
     'style-src': ["'self'"],
     'font-src': ["'self'"],
     'img-src': ["'self'", "data:"],
