@@ -161,3 +161,53 @@ footer {
 *, *::before, *::after {
     box-sizing: border-box;
 }
+
+:root {
+    --page-pad: clamp(1rem, 4vw, 2rem);
+    --gap: clamp(0.75rem, 2.5vw, 1.25rem);
+}
+body { padding: var(--page-pad); }
+img, video { max-width: 100%; height: auto; display: block; }
+
+footer { 
+  margin-top: clamp(2rem, 8vw, 6rem); /* replaces fixed 130px look */
+}
+
+.subscribe-form { width: min(100%, 560px); }
+.subscribe-form input[type="email"] { width: 100%; }
+.subscribe-form button { width: 100%; }
+
+.link-container { gap: var(--gap); }
+
+@media (max-width: 360px) {
+    .subscribe-form { padding: 1rem; }
+    .subscribe-form button { font-size: .95rem; padding: .5rem .75rem; }
+}
+
+@media (min-width: 480px) {
+    hr { width: 70%; }
+    .about-container { max-width: 65ch; }
+}
+
+@media (min-width: 768px) {
+    .subscribe-form {
+    flex-direction: row;
+    align-items: center;
+    gap: .75rem;
+    }
+    .subscribe-form input[type="email"] { flex: 1; width: auto; }
+    .subscribe-form button { width: auto; white-space: nowrap; padding: .6rem 1rem; }
+
+    .link-container {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    }
+}
+
+
+@media (min-width: 1024px) {
+    .about-container { max-width: 70ch; }
+    hr { width: 50%; }
+    body { font-size: 17px; }
+}
