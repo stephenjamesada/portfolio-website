@@ -1,57 +1,25 @@
 from flask import Flask, render_template, request, abort, url_for, redirect, flash
-from email_validator import validate_email, EmailNotValidError
 from config import SECRET_KEY
-from flask_mail import Mail, Message
 from flask_talisman import Talisman
-import json
 import os
-import hmac
-import hashlib
 
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = SECRET_KEY
 
-app.config['MAIL_SERVER'] = os.getenv("MAIL_SERVER", 'smtp.gmail.com')
-app.config['MAIL_PORT'] = int(os.getenv("MAIL_PORT", 587))
-app.config['MAIL_USE_TLS'] = os.getenv("MAIL_USE_TLS", "true").lower() == "true"
-app.config['MAIL_USE_SSL'] = os.getenv("MAIL_USE_SSL", "false").lower() == "true"
-app.config['MAIL_USERNAME'] = os.getenv("MAIL_USERNAME")
-app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASSWORD")
-app.config['MAIL_DEFAULT_SENDER'] = os.getenv("MAIL_DEFAULT_SENDER", app.config['MAIL_USERNAME'])
-
-GITHUB_SECRET = os.environ.get("GITHUB_WEBHOOK_SECRET", "").encode()
-
-mail = Mail(app)
-
 csp = {
-    'default-src': ["'self'"],
-    'script-src': ["'self'", "'unsafe-inline'"],
-    'style-src': ["'self'"],
-    'font-src': ["'self'"],
-    'img-src': ["'self'", "data:"],
-    'object-src': ["'none'"],
-    'base-uri': ["'none'"],
-    'form-action': ["'self'"],
-    'frame-ancestors': ["'none'"]
+'default-src': ["'self'"],
+'script-src': ["'self'", "'unsafe-inline'"],
+'style-src': ["'self'", "'unsafe-inline'"],
+'font-src': ["'self'"],
+'img-src': ["'self'", "data:"],
 }
 
 Talisman(
     app,
     content_security_policy=csp,
-    frame_options='DENY',
-    x_content_type_options='nosniff',
-    strict_transport_security=True,
-    strict_transport_security_max_age=31536000,
-    strict_transport_security_include_subdomains=True,
-    referrer_policy='no-referrer',
-    permissions_policy={
-        "geolocation": "()",
-        "camera": "()",
-        "microphone": "()",
-        "fullscreen": "()",
-        "payment": "()"
-    }
+    force_https=False,  # Let Render handle HTTPS
+    strict_transport_security=False  # Disable HSTS; Render sets this
 )
 
 @app.route('/')
@@ -87,4 +55,4 @@ def service_unavailable(e):
     return render_template('503.html'), 503
     
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5000, debug=False)
+    app.run(debug=True)
