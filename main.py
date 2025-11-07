@@ -55,4 +55,4 @@ def service_unavailable(e):
     return render_template('503.html'), 503
     
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(port=5000, debug=False)
